@@ -74,7 +74,7 @@ if st.button("Run Algorithm"):
     st.dataframe(rules)  # or use st.table(rules) for a static table
 
     # Text input widget for entering a comma-separated string
-    input_string = st.text_input("Enter items (comma-separated) for prediction:", "item1, item2, item3")
+    input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
     
     # Convert the input string to a list of strings
     input_items = frozenset([item.strip() for item in input_string.split(',')])
