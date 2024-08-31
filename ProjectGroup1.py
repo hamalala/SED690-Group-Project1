@@ -1,6 +1,10 @@
 
 import streamlit as st
-
+import pandas as pd
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import apriori
+from mlxtend.frequent_patterns import fpmax
+from mlxtend.frequent_patterns import association_rules
 # Set title
 st.title("Discovering Frequent Patterns and Association Rules")
 
@@ -40,7 +44,18 @@ min_lift = st.slider(
 # Create a button
 if st.button("Run Algorithm"):
     # Actions to perform when button is clicked
-    st.write(f"## Prediction Result: {algorithm}")
-    st.write(f"## Prediction min_support: {min_support}")
-    st.write(f"## Prediction min_confidence: {min_confidence}")
-    st.write(f"## Prediction min_lift: {min_lift}")
+    url = 'https://docs.google.com/spreadsheets/d/1-h4q2swBlPGO76pJkExdtIoVoMyoePjkovyk71c-PzA/export?format=csv'
+    df = pd.read_csv(url, header=None)
+    transactions = df.apply(lambda x: x.dropna().tolist(), axis=1).tolist()
+    te = TransactionEncoder()
+    te_ary = te.fit(transactions).transform(transactions)
+    df_encoded = pd.DataFrame(te_ary, columns=te.columns_)
+
+    if algorithm == 'Apriori Algorithm':
+        frequent_itemsets = apriori(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
+    else:
+        frequent_itemsets = fpmax(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
+    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
+    rules = rules[rules['confidence'] >= min_confidence]
+    rules = rules[rules['lift'] > min_lift]
+    print(rules)
