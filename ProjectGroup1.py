@@ -1,19 +1,16 @@
-
 import streamlit as st
 import pandas as pd
 from mlxtend.preprocessing import TransactionEncoder
-from mlxtend.frequent_patterns import apriori
-from mlxtend.frequent_patterns import fpmax
-from mlxtend.frequent_patterns import association_rules
+from mlxtend.frequent_patterns import apriori, fpmax, association_rules
 
 def predict(rules, input_items):
     results = rules[rules['antecedents'].apply(lambda x: x.issubset(input_items))]
     return results[['antecedents', 'consequents', 'confidence', 'lift']]
-    
+
 # Set title
 st.title("Discovering Frequent Patterns and Association Rules")
 
-st.markdown('[Can edit this sheet for you transaction](https://docs.google.com/spreadsheets/d/1-h4q2swBlPGO76pJkExdtIoVoMyoePjkovyk71c-PzA)')
+st.markdown('[Can edit this sheet for your transaction](https://docs.google.com/spreadsheets/d/1-h4q2swBlPGO76pJkExdtIoVoMyoePjkovyk71c-PzA)')
 # Define the radio button options
 options = ['Apriori Algorithm', 'FP-Growth Algorithm']
 # Create a radio button widget
@@ -73,18 +70,20 @@ if st.button("Run Algorithm"):
     st.write("### Association Rules")
     st.dataframe(rules)  # or use st.table(rules) for a static table
 
-    # Text input widget for entering a comma-separated string
-    input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
+    # Store rules in session state to maintain across reruns
+    st.session_state['rules'] = rules
+
 # Check if rules exist in session state
 if 'rules' in st.session_state:
     # Text input widget for entering a comma-separated string
     input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
-    # Convert the input string to a list of strings
-    input_items = frozenset([item.strip() for item in input_string.split(',')])
-    prediction = predict(st.session_state['rules'], input_items)
-    
-    if not prediction.empty:
-        st.write("### Prediction Results")
-        st.dataframe(prediction)
-    else:
-        st.write("### No strong association rules found for the given items.")
+    if st.button("Predict"):
+        # Convert the input string to a list of strings
+        input_items = frozenset([item.strip() for item in input_string.split(',')])
+        prediction = predict(st.session_state['rules'], input_items)
+        
+        if not prediction.empty:
+            st.write("### Prediction Results")
+            st.dataframe(prediction)
+        else:
+            st.write("### No strong association rules found for the given items.")
