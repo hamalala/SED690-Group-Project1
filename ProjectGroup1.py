@@ -78,12 +78,10 @@ if st.button("Run Algorithm"):
     
     # Convert the input string to a list of strings
     input_array = [item.strip() for item in input_string.split(',')]
-    # Button to trigger prediction
-    if st.button("Predict"):
-        prediction = predict(rules, input_array)
-        
-        if not prediction.empty:
-            st.write("### Prediction Results")
-            st.dataframe(prediction)
-        else:
-            st.write("### No strong association rules found for the given items.")
+    prediction = predict(rules, input_array)
+    
+    if not prediction.empty:
+        st.write("### Prediction Results")
+        st.dataframe(prediction)
+    else:
+        st.write("### No strong association rules found for the given items.")
