@@ -75,10 +75,14 @@ if st.button("Run Algorithm"):
 
     # Text input widget for entering a comma-separated string
     input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
-    if st.button("Prediction"):
+# Check if rules exist in session state
+if 'rules' in st.session_state:
+    # Text input widget for entering a comma-separated string
+    input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
+    if st.button("Predict"):
         # Convert the input string to a list of strings
         input_items = frozenset([item.strip() for item in input_string.split(',')])
-        prediction = predict(rules, input_items)
+        prediction = predict(st.session_state['rules'], input_items)
         
         if not prediction.empty:
             st.write("### Prediction Results")
