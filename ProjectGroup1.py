@@ -37,8 +37,10 @@ min_lift = st.slider(
     step=0.1  # Step size between values
 )
 
-# Display prediction result
-st.write(f"## Prediction Result: {algorithm}")
-st.write(f"## Prediction min_support: {min_support}")
-st.write(f"## Prediction min_confidence: {min_confidence}")
-st.write(f"## Prediction min_lift: {min_lift}")
+# Create a button
+if st.button("Run Algorithm"):
+    # Actions to perform when button is clicked
+    st.write(f"## Prediction Result: {algorithm}")
+    st.write(f"## Prediction min_support: {min_support}")
+    st.write(f"## Prediction min_confidence: {min_confidence}")
+    st.write(f"## Prediction min_lift: {min_lift}")
