@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from mlxtend.preprocessing import TransactionEncoder
-from mlxtend.frequent_patterns import apriori, fpmax, association_rules
+from mlxtend.frequent_patterns import apriori, fpgrowth, association_rules
 
 def predict(rules, input_items):
     results = rules[rules['antecedents'].apply(lambda x: x.issubset(input_items))]
@@ -57,17 +57,14 @@ if st.button("Run Algorithm"):
         frequent_itemsets = apriori(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
         st.session_state['algorithm_title'] = "Frequent Itemsets using Apriori:"
         
-
     else:
-        frequent_itemsets = fpmax(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
+        frequent_itemsets = fpgrowth(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
         st.session_state['algorithm_title'] = "Frequent Itemsets using FP-Growth:"
         
     st.session_state['algorithm_df'] = frequent_itemsets        
     rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
     rules = rules[rules['confidence'] >= min_confidence]
     rules = rules[rules['lift'] > min_lift]
-
-   
 
     # Store rules in session state to maintain across reruns
     st.session_state['rules'] = rules
