@@ -55,26 +55,31 @@ if st.button("Run Algorithm"):
 
     if algorithm == 'Apriori Algorithm':
         frequent_itemsets = apriori(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
-        st.write("Frequent Itemsets using Apriori:")
-        st.dataframe(frequent_itemsets)
+        st.session_state['algorithm_title'] = "Frequent Itemsets using Apriori:"
+        
 
     else:
         frequent_itemsets = fpmax(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
-        st.write("Frequent Itemsets using FP-Growth:")
-        st.dataframe(frequent_itemsets)
+        st.session_state['algorithm_title'] = "Frequent Itemsets using FP-Growth:"
         
+    st.session_state['algorithm_df'] = frequent_itemsets        
     rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
     rules = rules[rules['confidence'] >= min_confidence]
     rules = rules[rules['lift'] > min_lift]
 
-    st.write("### Association Rules")
-    st.dataframe(rules)  # or use st.table(rules) for a static table
+   
 
     # Store rules in session state to maintain across reruns
     st.session_state['rules'] = rules
 
 # Check if rules exist in session state
 if 'rules' in st.session_state:
+    st.write(st.session_state['algorithm_title'])
+    st.dataframe(st.session_state['algorithm_df'])
+
+    st.write("### Association Rules")
+    st.dataframe(st.session_state['rules'])  # or use st.table(rules) for a static table
+    
     # Text input widget for entering a comma-separated string
     input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
     if st.button("Predict"):
