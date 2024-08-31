@@ -75,13 +75,13 @@ if st.button("Run Algorithm"):
 
     # Text input widget for entering a comma-separated string
     input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
-    
-    # Convert the input string to a list of strings
-    input_items = frozenset([item.strip() for item in input_string.split(',')])
-    prediction = predict(rules, input_items)
-    
-    if not prediction.empty:
-        st.write("### Prediction Results")
-        st.dataframe(prediction)
-    else:
-        st.write("### No strong association rules found for the given items.")
+    if st.button("Prediction"):
+        # Convert the input string to a list of strings
+        input_items = frozenset([item.strip() for item in input_string.split(',')])
+        prediction = predict(rules, input_items)
+        
+        if not prediction.empty:
+            st.write("### Prediction Results")
+            st.dataframe(prediction)
+        else:
+            st.write("### No strong association rules found for the given items.")
