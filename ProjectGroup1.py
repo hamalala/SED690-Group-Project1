@@ -5,6 +5,11 @@ from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import apriori
 from mlxtend.frequent_patterns import fpmax
 from mlxtend.frequent_patterns import association_rules
+
+def predict(rules, input_items):
+    results = rules[rules['antecedents'].apply(lambda x: x.issubset(input_items))]
+    return results[['antecedents', 'consequents', 'confidence', 'lift']]
+    
 # Set title
 st.title("Discovering Frequent Patterns and Association Rules")
 
@@ -53,9 +58,32 @@ if st.button("Run Algorithm"):
 
     if algorithm == 'Apriori Algorithm':
         frequent_itemsets = apriori(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
+        st.write("Frequent Itemsets using Apriori:")
+        st.dataframe(frequent_itemsets)
+
     else:
         frequent_itemsets = fpmax(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
+        st.write("Frequent Itemsets using FP-Growth:")
+        st.dataframe(frequent_itemsets)
+        
     rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
     rules = rules[rules['confidence'] >= min_confidence]
     rules = rules[rules['lift'] > min_lift]
-    print(rules)
+
+    st.write("### Association Rules")
+    st.dataframe(rules)  # or use st.table(rules) for a static table
+
+    # Text input widget for entering a comma-separated string
+    input_string = st.text_input("Enter items (comma-separated) for prediction:", "item1, item2, item3")
+    
+    # Convert the input string to a list of strings
+    input_array = [item.strip() for item in input_string.split(',')]
+    # Button to trigger prediction
+    if st.button("Predict"):
+        prediction = predict(rules, input_array)
+        
+        if not prediction.empty:
+            st.write("### Prediction Results")
+            st.dataframe(prediction)
+        else:
+            st.write("### No strong association rules found for the given items.")
