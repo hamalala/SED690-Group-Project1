@@ -45,7 +45,7 @@ if st.button("Run Algorithm"):
         st.session_state['algorithm_df'] = frequent_itemsets
         
         if frequent_itemsets.empty:
-            rules = None
+            rules = pd.DataFrame()
             st.write("No frequent itemsets found with the given minimum support.")
         else:
             rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
