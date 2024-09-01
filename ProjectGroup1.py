@@ -53,7 +53,7 @@ if st.button("Run Algorithm"):
 
             st.session_state['rules'] = rules
 
-            if rules.empty:
+            if 'rules' in st.session_state and not st.session_state['rules'].empty:
                 st.write("No strong association rules found with the given minimum confidence and lift.")
             else:
                 st.write(st.session_state['algorithm_title'])
