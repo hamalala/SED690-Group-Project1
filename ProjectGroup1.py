@@ -60,7 +60,7 @@ if st.button("Run Algorithm"):
                 st.session_state['rules'] = rules
 
 # Predict section
-if 'rules' in st.session_state and not st.session_state['rules'].empty:
+if 'rules' in st.session_state and not st.session_state['rules'].empty and not st.session_state['rules'] = None:
     
     st.write(st.session_state['algorithm_title'])
     st.dataframe(st.session_state['algorithm_df'])
