@@ -51,18 +51,20 @@ if st.button("Run Algorithm"):
             rules = rules[rules['confidence'] >= min_confidence]
             rules = rules[rules['lift'] > min_lift]
 
-            st.session_state['rules'] = rules
+            
 
             if rules.empty:
                 st.write("No strong association rules found with the given minimum confidence and lift.")
             else:
-                st.write(st.session_state['algorithm_title'])
-                st.dataframe(st.session_state['algorithm_df'])
-                st.write("### Association Rules")
-                st.dataframe(st.session_state['rules'])
+                st.session_state['rules'] = rules
 
 # Predict section
 if 'rules' in st.session_state and not st.session_state['rules'].empty:
+    
+    st.write(st.session_state['algorithm_title'])
+    st.dataframe(st.session_state['algorithm_df'])
+    st.write("### Association Rules")
+    st.dataframe(st.session_state['rules'])
     input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
     if st.button("Predict"):
         input_items = frozenset([item.strip() for item in input_string.split(',')])
