@@ -11,76 +11,60 @@ def predict(rules, input_items):
 st.title("Discovering Frequent Patterns and Association Rules")
 st.write("Group: 704-710-712-714")
 st.markdown('[Can edit this sheet for your transaction](https://docs.google.com/spreadsheets/d/1-h4q2swBlPGO76pJkExdtIoVoMyoePjkovyk71c-PzA)')
+
 # Define the radio button options
 options = ['Apriori Algorithm', 'FP-Growth Algorithm']
-# Create a radio button widget
 algorithm = st.radio("Choose an Algorithm:", options)
 
-# Creating a range slider
-min_support = st.slider(
-    "Select minimum Support:",
-    min_value=2,  # Minimum value of the slider
-    max_value=20,  # Maximum value of the slider
-    value=3,  # Default value of the slider
-    step=1  # Step size between values
-)
-
-# Creating a range slider
-min_confidence = st.slider(
-    "Select minimum Confidence:",
-    min_value=0.0,  # Minimum value of the slider
-    max_value=1.0,  # Maximum value of the slider
-    value=0.5,  # Default value of the slider
-    step=0.05  # Step size between values
-)
-
-# Creating a range slider
-min_lift = st.slider(
-    "Select minimum Lift:",
-    min_value=0.0,  # Minimum value of the slider
-    max_value=10.0,  # Maximum value of the slider
-    value=1.0,  # Default value of the slider
-    step=0.1  # Step size between values
-)
+# Creating sliders
+min_support = st.slider("Select minimum Support:", min_value=2, max_value=20, value=3, step=1)
+min_confidence = st.slider("Select minimum Confidence:", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
+min_lift = st.slider("Select minimum Lift:", min_value=0.0, max_value=10.0, value=1.0, step=0.1)
 
 # Create a button
 if st.button("Run Algorithm"):
-    # Actions to perform when button is clicked
     url = 'https://docs.google.com/spreadsheets/d/1-h4q2swBlPGO76pJkExdtIoVoMyoePjkovyk71c-PzA/export?format=csv'
     df = pd.read_csv(url, header=None)
     transactions = df.apply(lambda x: x.dropna().tolist(), axis=1).tolist()
-    te = TransactionEncoder()
-    te_ary = te.fit(transactions).transform(transactions)
-    df_encoded = pd.DataFrame(te_ary, columns=te.columns_)
-
-    if algorithm == 'Apriori Algorithm':
-        frequent_itemsets = apriori(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
-        st.session_state['algorithm_title'] = "Frequent Itemsets using Apriori:"
-        
-    else:
-        frequent_itemsets = fpgrowth(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
-        st.session_state['algorithm_title'] = "Frequent Itemsets using FP-Growth:"
-        
-    st.session_state['algorithm_df'] = frequent_itemsets        
-    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
-    rules = rules[rules['confidence'] >= min_confidence]
-    rules = rules[rules['lift'] > min_lift]
-
-    # Store rules in session state to maintain across reruns
-    st.session_state['rules'] = rules
-
-# Check if rules exist in session state
-if 'rules' in st.session_state:
-    st.write(st.session_state['algorithm_title'])
-    st.dataframe(st.session_state['algorithm_df'])
-
-    st.write("### Association Rules")
-    st.dataframe(st.session_state['rules'])  # or use st.table(rules) for a static table
     
-    # Text input widget for entering a comma-separated string
+    # Check if there are any transactions to process
+    if not transactions:
+        st.write("No transactions found in the data.")
+    else:
+        te = TransactionEncoder()
+        te_ary = te.fit(transactions).transform(transactions)
+        df_encoded = pd.DataFrame(te_ary, columns=te.columns_)
+
+        if algorithm == 'Apriori Algorithm':
+            frequent_itemsets = apriori(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
+            st.session_state['algorithm_title'] = "Frequent Itemsets using Apriori:"
+        else:
+            frequent_itemsets = fpgrowth(df_encoded, min_support=min_support/len(transactions), use_colnames=True)
+            st.session_state['algorithm_title'] = "Frequent Itemsets using FP-Growth:"
+
+        st.session_state['algorithm_df'] = frequent_itemsets
+        
+        if frequent_itemsets.empty:
+            st.write("No frequent itemsets found with the given minimum support.")
+        else:
+            rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
+            rules = rules[rules['confidence'] >= min_confidence]
+            rules = rules[rules['lift'] > min_lift]
+
+            st.session_state['rules'] = rules
+
+            if rules.empty:
+                st.write("No strong association rules found with the given minimum confidence and lift.")
+            else:
+                st.write(st.session_state['algorithm_title'])
+                st.dataframe(st.session_state['algorithm_df'])
+                st.write("### Association Rules")
+                st.dataframe(st.session_state['rules'])
+
+# Predict section
+if 'rules' in st.session_state and not st.session_state['rules'].empty:
     input_string = st.text_input("Enter items (comma-separated) for prediction:", "Monitor")
     if st.button("Predict"):
-        # Convert the input string to a list of strings
         input_items = frozenset([item.strip() for item in input_string.split(',')])
         prediction = predict(st.session_state['rules'], input_items)
         
