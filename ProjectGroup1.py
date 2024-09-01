@@ -56,7 +56,7 @@ if st.button("Run Algorithm"):
             if rules.empty:
                 st.write("No strong association rules found with the given minimum confidence and lift.")
             else:
-	    	st.session_state['rules'] = rules
+		st.session_state['rules'] = rules
                 st.write(st.session_state['algorithm_title'])
                 st.dataframe(st.session_state['algorithm_df'])
                 st.write("### Association Rules")
