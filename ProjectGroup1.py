@@ -46,6 +46,8 @@ if st.button("Run Algorithm"):
         
         if frequent_itemsets.empty:
             st.write("No frequent itemsets found with the given minimum support.")
+            if 'rules' in st.session_state:
+                del st.session_state['rules']
         else:
             rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
             rules = rules[rules['confidence'] >= min_confidence]
