@@ -54,7 +54,7 @@ if st.button("Run Algorithm"):
             
 
             if rules.empty:
-                st.session_state['rules'] = pd.DataFrame()
+                st.session_state['rules'] = None
                 st.write("No strong association rules found with the given minimum confidence and lift.")
             else:
                 st.session_state['rules'] = rules
