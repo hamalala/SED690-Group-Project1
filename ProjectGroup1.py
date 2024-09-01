@@ -45,7 +45,6 @@ if st.button("Run Algorithm"):
         st.session_state['algorithm_df'] = frequent_itemsets
         
         if frequent_itemsets.empty:
-            rules = pd.DataFrame()
             st.write("No frequent itemsets found with the given minimum support.")
         else:
             rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
@@ -55,6 +54,7 @@ if st.button("Run Algorithm"):
             
 
             if rules.empty:
+                st.session_state['rules'] = pd.DataFrame()
                 st.write("No strong association rules found with the given minimum confidence and lift.")
             else:
                 st.session_state['rules'] = rules
